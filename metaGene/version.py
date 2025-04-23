@@ -1,0 +1,6 @@
+__version__ = "1.0.2"
+__author__ = "Yaozhong Zhang"
+__maintainer__ = "Yaozhong Zhang"
+__email__ = "Yaozhongzyz@163.com"
+__institution__ = "Nanjing Agricultural University"
+__status__ = "Development"
