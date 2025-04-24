@@ -1,131 +1,237 @@
 
-# MetaGene
+# 🧬MetaGene
 
-**MetaGene** 是一个综合性的宏基因组数据分析工具，支持从原始测序数据出发，完成包括物种分类、功能基因识别、物种溯源以及水平基因转移（Horizontal Gene Transfer, HGT）分析的全流程处理。
+**MetaGene** is a comprehensive metagenomic data analysis tool that supports end-to-end processing, including species classification, functional gene identification, species tracing, and Horizontal Gene Transfer (HGT) analysis, starting from raw sequencing data.
 
-## 🔧 核心功能
+## 🔧 Core Features
 
-1. **基于Reads的物种分类学分析**  
-   利用 [Kraken2](https://ccb.jhu.edu/software/kraken2/) 进行高效的分类学注释。默认自建的基于Pangenomes的数据库，同时支持自定义数据库。
-   
-2. **基于Reads的功能基因识别与溯源分析**  
-   基于BP-Tracer流程，提取抗生素抗性基因（ARGs）、可移动遗传元件（MGEs）等主流功能基因并追踪其潜在宿主。同时还支持毒力因子（VFs）、金属抗性基因（MRGs）以及抗压力基因STREE（SGs）
+1. **Reads-based Species Classification**  
+    Uses Kraken2 for efficient taxonomic annotation. The tool comes with a pre-built Pangenomes-based database and also supports custom database loading.
 
-3. **基于Contig的水平基因转移分析（HGT）**  
-   集成 [WAAFLE](https://github.com/biobakery/waafle) 工具，识别可能的基因水平转移事件。默认自建的基于Pangenomes的数据库，同时支持自定义数据库，可使用WAAFLE自带的chocophlan2数据库。
+2. **Reads-based Functional Gene Identification and Tracing**  
+    Based on a custom Python3 workflow, it supports the identification and tracing of the following major functional genes:
+    - Antibiotic Resistance Genes (ARGs)
+    - Mobile Genetic Elements (MGEs)
+    - Virulence Factors (VFs)
+    - Metal Resistance Genes (MRGs)
+    - Stress Genes (SGs)
+
+3. **Contig-based Horizontal Gene Transfer (HGT) Analysis**  
+    Integrates the [WAAFLE](https://github.com/biobakery/waafle) tool for identifying potential HGT events. It supports multiple databases (default Pangenomes database, as well as WAAFLE's `chocophlan2` database, etc.).
 
 ---
 
-## 📦 安装方式
+## 📦 Installation
 
-软件主提安装
+### Main Installation
+
 ```bash
-# git clone方式
+# Clone the repository
 git clone https://github.com/Astudentx/MetaGene
-# 安装依赖（推荐使用conda）
+cd MetaGene
+
+# Create and activate the Conda environment
 conda env create -f environment.yml
 conda activate metagene
 ```
-数据库安装
-```bash
-# 数据库较大，请通过百度网盘下载，安装到 `MetaGene/db/`中
-# 网盘链接如下：
 
+### Database Installation
+
+```bash
+# The database is large, please download it from Baidu Netdisk and install it in the `MetaGene/db/` directory
+# Download link:
+# Link: https://pan.baidu.com/s/xxxxxxxx Extract code: xxxx
 ```
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 物种分类分析 
+### 1. Preparation
 
+- Prepare paired-end FASTQ files;
+- Create a `<Paired_fastaq_list>` file using Tab delimiters, e.g.:
 ```bash
-# 默认使用
-MetaGene BP --file <Paired_fastaq_list> --pwd <output_folder> --GeneType ARGs,MGEs
-MetaGene Kraken2 --file <Paired_fastaq_list> --db <database_name> --pwd <output_folder>
+A1	/FilePath/A1.clean.1.fq.gz	/FilePath/A1.clean.2.fq.gz
+A2	/FilePath/A2.clean.1.fq.gz	/FilePath/A2.clean.2.fq.gz
+A3	/FilePath/A3.clean.1.fq.gz	/FilePath/A3.clean.2.fq.gz
 ```
 
-- 支持的数据库包括：`BPTax_V1`, `BPTax_V2`, `krakenDB-202212`, `krakenDB-202406`
+- For HGT analysis, also prepare the corresponding assembled Contig files, using Tab delimiters, e.g.:
+```bash
+A1	/FilePath/A1.contig.ok.fa
+A2	/FilePath/A2.contig.ok.fa
+A3	/FilePath/A3.contig.ok.fa
+```
 
-### 2. 功能基因识别与溯源分析
+### 2. Species Classification and Functional Gene Identification and Tracing
 
-#### (1) 基因注释主流程 (BP)
+#### Gene Annotation Main Workflow (BP)
 
 ```bash
 MetaGene BP --file <Paired_fastaq_list> --pwd <output_folder> --GeneType ARGs,MGEs
 ```
 
-#### (2) 基因序列提取 (BP2)
+#### Gene Sequence Extraction and Tracing Table Generation (BP2)
 
 ```bash
 MetaGene BP2 --file <Paired_fastaq_list> --pwd <output_folder> --GeneType ARGs
 ```
 
+You can also perform analysis with external Kraken2 databases (Kraken2):
+```bash
+# By default, MetaGene BP will generate species analysis scripts in the shell folder. To specify a database, use Kraken's other databases.
+MetaGene Kraken2 --file <Paired_fastaq_list> --db <database_name> --pwd <output_folder>
+```
 
+- Supported databases include: `BPTax_V1`, `BPTax_V2`, `krakenDB-202212`, `krakenDB-202406`
 
+### 3. Horizontal Gene Transfer Analysis (HGT)
 
-### 3. 水平基因转移分析 (HGT)
+#### Contig Assembly (Megahit or SPAdes)
+
+```bash
+# You can choose your own assembled Contig files
+# Additionally, Megahit and SPAdes assembly tools are provided for you to choose based on your needs
+# Megahit: Recommended for less resource usage and faster speed
+# SPAdes: Longer contigs, better accuracy, and more HGT events identified
+MetaGene Megahit --file <Paired_fastaq_list> --pwd <output_folder> # Megahit
+MetaGene SPAdes   --file <Paired_fastaq_list> --pwd <output_folder> # SPAdes
+```
+
+#### Horizontal Gene Transfer Analysis
 
 ```bash
 MetaGene HGT --file <Contig_fasta_list> --db RefseqPan2 --pwd <output_folder>
 ```
 
-- 可选数据库包括：`RefseqPan2`, `chocophlan2`, `UnigeneSet-waafledb.v1.fa`, `UnigeneSet-waafledb.v2.fa`
-####  组装工具
+- Optional databases include: `RefseqPan2`, `chocophlan2`, `UnigeneSet-waafledb.v1.fa`, `UnigeneSet-waafledb.v2.fa`
 
-```bash
-# 额外封装了Megahit与SPAdes两种主流组装软件，可基于自身情况进行挑选
-# Megahit: 推荐，占用资源更少，速度更快
-# SPAdes: 长度更长，识别HGT的准确性更高，识别事件更多
-MetaGene Megahit --file <Paired_fastaq_list> --pwd <output_folder> # Megahit
-MetaGene SPAdes   --file <Paired_fastaq_list> --pwd <output_folder> # SPAdes
-```
 ---
 
-## 🧬 主要项目结构说明
+## 📂 Shell Script Explanation and Submission Recommendations
+
+When using `MetaGene` for data analysis, a large number of `.sh` scripts are automatically generated for task submission. These scripts are located in the `shell/` folder, structured as follows (partial view):
+
+```bash
+# Tax Analysis----------------------
+# Kraken2 species annotation
+Tax.S01.Kraken2.A1.sh
+# Merge to generate abundance table
+Tax.S02.Kraken2.Merge.sh
+
+# BP1 Analysis----------------------
+# BP1 Reads sequence statistics
+BP.S01.RawStat.A1.sh
+# BP1 Reads functional gene annotation
+BP.S02.ARGsAnno.A1.sh
+BP.S02.MGEsAnno.A1.sh
+BP.S02.MRGsAnno.A1.sh
+BP.S02.SGsAnno.A1.sh
+BP.S02.VFsAnno.A1.sh
+
+# BP2 Analysis----------------------
+# BP2 extract sequences for secondary annotation
+BP.S03.temp.ARGs.0.sh
+BP.S03.temp.ARGs.1.sh
+BP.S03.temp.ARGs.2.sh
+BP.S03.temp.MGEs.0.sh
+# BP2 merge and generate abundance table
+BP.S04.ARGs.Merge.sh
+BP.S04.MGEs.Merge.sh
+BP.S04.MRGs.Merge.sh
+BP.S04.SGs.Merge.sh
+BP.S04.VFs.Merge.sh
+
+# HGT Analysis----------------------
+# Reads assembly
+Megahit.S01.Assambly.A1.sh
+SPAdes.S01.Assambly.A1.sh
+# WAAFLE HGT analysis
+HGT.S01.chocophlan2.A1.sh
+
+```
+
+### 🧭 Shell Script Explanation
+
+- `Tax.`: Taxonomic annotation (Kraken2 analysis)
+- `BP.`: Functional gene annotation and tracing (including ARGs, MGEs, MRGs, SGs, VFs, etc.)
+- `Megahit.` / `SPAdes.`: Assembly modules based on Megahit or SPAdes
+- `HGT.`: Horizontal Gene Transfer analysis based on WAAFLE
+
+### 🗂️ Submission Rules Recommendations
+
+1. **Different Modules Can Be Submitted Independently**  
+   E.g., `BP.` and `Tax.` modules can be submitted separately without waiting for each other to finish.
+
+2. **Submit Tasks in Sequence Within the Same Module**  
+   - For example, in the `BP.` module, submit tasks in the order of `BP.S01.` → `BP.S02.` → `BP.S03.` → `BP.S04.`
+   - Different sample scripts within each stage (e.g., `BP.S01.RawStat.A1.sh` ~ `A6.sh`) can be submitted in parallel.
+
+3. **Subtasks Are Automatically Named**  
+   - Scripts are automatically named by sample ID (e.g., `A1` ~ `A6`) or task number, making it easier to track the analysis process.
+
+4. **Do Not Skip Merge Steps**  
+   - All `.Merge.sh` scripts (e.g., `BP.S04.ARGs.Merge.sh`) must be executed after all sample analyses in the corresponding stage are complete.
+
+## 🧬 Main Project Structure
 
 ```
 MetaGene/
 ├── metaGene/
-│   ├── Kraken2.py     # 物种分类模块
-│   ├── BP.py               # 主功能基因注释流程
-│   ├── BP2.py             # 功能基因序列提取
-│   ├── HGT.py             # WAAFLE调用脚本
-│   ├── Megahit.py         # Megahit拼接
-│   ├── SPAdes.py          # SPAdes拼接
-│   ├── config/            # 配置模块
-│   ├── tool/              # 公共函数
+│   ├── Kraken2.py     # Species classification module
+│   ├── BP.py               # Main functional gene annotation workflow
+│   ├── BP2.py             # Functional gene sequence extraction
+│   ├── HGT.py             # WAAFLE script for HGT
+│   ├── Megahit.py         # Megahit assembly
+│   ├── SPAdes.py          # SPAdes assembly
+│   ├── config/            # Configuration module
+│   ├── tool/              # Common functions
 │   └── ...
 ├── bin/
-│   └── MetaGene           # 主执行脚本
+│   └── MetaGene           # Main execution script
 ├── README.md
-├── environment.yml        # Conda依赖环境
+├── environment.yml        # Conda environment dependencies
 └── ...
 ```
 
----
+## 🧬 Main Project Output Description
 
-## 🔗 外部依赖
+```bash
+以下是你提供的 Bash 注释内容的英文翻译：
 
-请确保已安装以下工具，或使用内置 Conda 环境进行统一管理：
 
-- [Kraken2](https://ccb.jhu.edu/software/kraken2/)
-- [MEGAHIT](https://github.com/voutcn/megahit)
-- [SPAdes](https://github.com/ablab/spades)
-- [WAAFLE](https://github.com/biobakery/waafle)
-- BLAST+
----
+# Functional Gene Alignment Results------------------------------------------------------------
+Final.ARGs.m8.list                 # List of m8 file paths for each sample
+Final.ARGs.blast.m8                # Merged raw BLAST alignment results for ARGs from all samples
+Final.ARGs.blast.m8.fil            # Filtered alignment results based on Identity, Coverage, etc.
+Final.extracted.fa                 # Sequences extracted from all samples that match the ARGs database
+Final.extracted.fa.fil             # Sequences extracted from Final.ARGs.blast.m8.fil that meet the threshold requirements
+Final.meta_data_online.txt         # Basic statistics for each sample, including raw reads, 16S count, and cell number
 
-## 📄 引用格式（如适用）
+# Functional Gene Annotation Result Statistics------------------------------------------------------------
+sample_hits_count.txt              # Number of ARGs matched in each sample (unnormalized)
+sample_hits_rate.txt               # Frequency of matched ARGs in each sample (ppm normalized)
 
-如您在研究中使用本工具，请引用以下文章/作者信息：
-> **BP-tracer: A metagenomic pipeline for tracing the multifarious biopollutome**
-> Yaozhong Zhang, Gaofei Jiang
-> _XXXXX_ (2025)
-> doi: [XXXXX](XXXXX)
----
+# Functional Gene Type and Subtype Abundance Tables------------------------------------------------------------
+OUT.ARGs.16s.txt                   # Total abundance of all ARGs (16S normalized), summarized by sample
+OUT.ARGs.16s.Subtype.txt           # Abundance of each ARG Subtype (16S copy number normalized)
+OUT.ARGs.16s.Type.txt              # Abundance of each ARG Type (16S copy number normalized)
+OUT.ARGs.cell_number.txt           # Total abundance of all ARGs (cell number normalized), summarized by sample
+OUT.ARGs.cell_number.Subtype.txt   # Abundance of each ARG Subtype (cell number normalized)
+OUT.ARGs.cell_number.Type.txt      # Abundance of each ARG Type (cell number normalized)
+OUT.ARGs.ppm.txt                   # Total abundance of all ARGs (ppm normalized), summarized by sample
+OUT.ARGs.ppm.Subtype.txt           # Abundance of each ARG Subtype (ppm normalized, based on million reads)
+OUT.ARGs.ppm.Type.txt              # Abundance of each ARG Type (ppm normalized)
 
-## 📬 联系方式
-
-如有问题或建议，欢迎通过 Issues 或 Email 联系我们。
-yaozhongzyz@163.com & gjiang@njau.edu.cn
+# Functional Gene Species Tracing Analysis Tables------------------------------------------------------------
+Tax.ARGs.ppm.txt                   # Species tracing information for all ARGs (ppm normalized), includes all taxonomic levels
+Tax.ARGs.Kingdom.ppm.txt           # Species tracing results for ARGs by Kingdom (ppm normalized)
+Tax.ARGs.Phylum.ppm.txt            # Species tracing results for ARGs by Phylum (ppm normalized)
+Tax.ARGs.Order.ppm.txt             # Species tracing results for ARGs by Order (ppm normalized)
+Tax.ARGs.Class.ppm.txt             # Species tracing results for ARGs by Class (ppm normalized)
+Tax.ARGs.Family.ppm.txt            # Species tracing results for ARGs by Family (ppm normalized)
+Tax.ARGs.Genus.ppm.txt             # Species tracing results for ARGs by Genus (ppm normalized)
+Tax.ARGs.Species.ppm.txt           # Species tracing results for ARGs by Species (ppm normalized)
+Tax.ARGs.Lineage.ppm.txt           # Full taxonomic lineage tracing results for ARGs (ppm normalized)
+```
