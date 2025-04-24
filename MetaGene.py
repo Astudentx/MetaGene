@@ -164,6 +164,7 @@ if __name__ == '__main__':
         print('Kraken2 -> %s' % Kraken2_description)
         print('BP -> %s' % BP_description)
         print('BP2 -> %s' % BP2_description)
+        print('HGT -> %s' % HGT_description)
         print('SPAdes -> %s' % SPAdes_description)
         print('Megahit -> %s' % Megahit_description)
         sys.exit(0)

@@ -6,3 +6,5 @@ bak2/
 db.tar.gz
 log.txt
 nohup.out
+metaGene/__pycache__/
+*.pyc
