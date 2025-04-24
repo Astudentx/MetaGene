@@ -265,7 +265,7 @@ if __name__ == '__main__':
             script_paths_all.append(script_path)
         #soft_runner.run_scripts_parallel(script_paths_all1, max_workers=3)
         
-        soft_runner = Kraken2.Kraken2Runner2(config= config,id_list= dataList.id)
+        soft_runner = Kraken2.Kraken2Runner2(config= config,id_list= dataList.id,lineage="T")
         soft_runner.print_command(should_print=args.print)
         script_path = os.path.join(config.SHELL_PATH, f"Tax.S02.Kraken2.Merge.sh")
         soft_runner.generate_script(script_path)

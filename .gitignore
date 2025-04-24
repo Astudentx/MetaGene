@@ -3,3 +3,6 @@ db/
 tests/
 bak/
 bak2/
+db.tar.gz
+log.txt
+nohup.out

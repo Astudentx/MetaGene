@@ -26,6 +26,7 @@ class Kraken2Runner(BaseRunner):
         file1 = self.params.get('file1')
         file2 = self.params.get('file2')
 
+
         cmd = textwrap.dedent(rf"""
         cd {config.Kraken2_OUTPUT_PATH}
         {config.Kraken2_MAPPING_SOFTWARE}/kraken2 --db {config.Kraken2_DATABASE} --threads {config.Kraken2_THREADS} --quick --report-zero-counts --gzip-compressed --paired --output {id}.readinfo --report {id}.report {file1} {file2}
@@ -47,6 +48,8 @@ class Kraken2Runner2(BaseRunner):
         # 设置接口参数
         config = self.params.get('config')
         id_list = self.params.get('id_list')
+        lineage = self.params.get('lineage', 'F')  # 新增lineage参数，默认值F
+
         
         id_list_D =  " ".join([s + ".report.D" for s in id_list])
         id_list_P =  " ".join([s + ".report.P" for s in id_list])
@@ -74,7 +77,10 @@ class Kraken2Runner2(BaseRunner):
         
         # 界门纲目科属种简单版本
         perl  {config.Kraken2_MAPPING_SOFTWARE}/mybin/kraken2-mergeStat-New.pl -prefix taxonomy -tax {config.Kraken2_TAXLIST}  -out TaxAbu
+        """)
         
+        if lineage != "F":
+            cmd += textwrap.dedent(rf"""
         # TaxID合并版本分析
         #python  {config.Kraken2_MAPPING_SOFTWARE}/mybin/kraken2-combineSample-TaxID.py -i {id_list_D}  -l Kingdom  -n {id_list3} --taxonomy {config.Kraken2_DATABASE}/Kraken2.Taxonomy.refseq_240519.txt -o TaxIDAbu.D
         #python  {config.Kraken2_MAPPING_SOFTWARE}/mybin/kraken2-combineSample-TaxID.py -i {id_list_P}  -l Phylum   -n {id_list3} --taxonomy {config.Kraken2_DATABASE}/Kraken2.Taxonomy.refseq_240519.txt -o TaxIDAbu.P
